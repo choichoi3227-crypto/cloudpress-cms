@@ -1,0 +1,37 @@
+---
+// src/layouts/AdminLayout.astro
+import Sidebar from '../components/admin/Sidebar.astro'; // 실제 경로에 맞게 수정
+import TopBar from '../components/TopBar.astro'; // 실제 경로에 맞게 수정
+---
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title><slot name="title">CloudPress Admin</slot></title>
+    <!-- 워드프레스 공식 CSS를 CDN에서 직접 로드하여 100% 동일한 UI 구현 -->
+    <link rel="stylesheet" href="https://wordpress.org/wp-admin/css/common.min.css" />
+    <link rel="stylesheet" href="https://wordpress.org/wp-admin/css/dashboard.min.css" />
+    <link rel="stylesheet" href="https://wordpress.org/wp-admin/css/forms.min.css" />
+    <link rel="stylesheet" href="https://wordpress.org/wp-admin/css/buttons.min.css" />
+    <link rel="stylesheet" href="https://wordpress.org/wp-admin/css/widgets.min.css" />
+    <link rel="stylesheet" href="https://wordpress.org/wp-admin/css/site-health.min.css" />
+    <style>
+        /* 워드프레스 공식 색상 시스템 적용 */
+        :root { --wp-admin-theme-color: #2271b1; }
+        body.wp-admin { background: #f0f0f1; display: flex; min-height: 100vh; margin: 0; }
+        #wpcontent { display: flex; flex-direction: column; flex-grow: 1; }
+        #wpbody { flex-grow: 1; padding: 20px; }
+        /* Tailwind CSS를 사용한다면 여기에 @tailwind base; @tailwind components; @tailwind utilities; */
+    </style>
+</head>
+<body class="wp-admin">
+    <Sidebar />
+    <div id="wpcontent">
+        <TopBar />
+        <div id="wpbody">
+            <slot />
+        </div>
+    </div>
+</body>
+</html>
+
