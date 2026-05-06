@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node build-scripts/build-vfs.js",
-    "build:astro": "astro build",
+    "build": "astro build",
     "build:vfs": "node build-scripts/build-vfs.js",
     "preview": "astro preview",
     "deploy": "npm run build && wrangler deploy",
@@ -22,11 +21,12 @@
     "setup": "npm run cf:create-d1 && npm run cf:create-kv-cache && npm run cf:create-kv-session"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.0.0",
+    "@astrojs/cloudflare": "^11.2.0",
     "@php-wasm/web": "^0.9.17",
-    "astro": "^4.16.0"
+    "astro": "^4.16.19"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250430.0",
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0",
     "wrangler": "^4.0.0"
