@@ -1,32 +1,28 @@
 // astro.config.mjs — CloudPress CMS
+// @astrojs/cloudflare v11 + Astro v4 호환
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   output: 'server',
   adapter: cloudflare({
-    mode: 'directory',        // dist/_worker.js 생성 (wrangler.toml main과 일치)
-    functionPerRoute: false,  // 단일 Worker 번들
+    // v11에서는 mode 옵션 대신 platformProxy 사용
+    platformProxy: {
+      enabled: true,
+    },
     imageService: 'passthrough',
   }),
   vite: {
-    build: {
-      minify: true,
-    },
-    // Cloudflare Workers 환경에서 Node.js 내장 모듈 폴리필
     ssr: {
-      target: 'webworker',
+      // Cloudflare Workers 환경에서 외부 모듈 처리
+      external: ['node:buffer', 'node:crypto', 'node:stream', 'node:util'],
       noExternal: ['@php-wasm/web'],
     },
     define: {
-      // php-wasm 빌드에 필요한 환경 변수
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     },
-  },
-  // TypeScript 경로 별칭
-  resolve: {
-    alias: {
-      '@': '/src',
+    build: {
+      minify: true,
     },
   },
 });
