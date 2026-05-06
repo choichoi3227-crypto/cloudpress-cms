@@ -1,0 +1,87 @@
+# CloudPress CMS Worker — wrangler.toml
+# Astro + WordPress PHP Runtime on Cloudflare Workers
+# PHP: WebAssembly (php-wasm 8.2)
+# DB: Cloudflare D1 (SQLite)
+# Storage: GitHub (via GitHub API)
+
+# ── 메인 CMS Worker ──────────────────────────────────────────────────────────
+name            = "cloudpress-cms"
+main            = "dist/_worker.js"
+compatibility_date  = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ── 정적 파일 (Astro 빌드 결과물) ────────────────────────────────────────────
+[assets]
+directory = "."
+binding   = "ASSETS"
+
+# ── D1: WordPress 콘텐츠 DB ──────────────────────────────────────────────────
+# wrangler d1 create cloudpress-cms-db 실행 후 아래 값을 채워넣으세요.
+[[d1_databases]]
+binding       = "DB"
+database_name = "cloudpress-cms-db"
+database_id   = "REPLACE_WITH_YOUR_D1_ID"
+
+# ── KV: 페이지 캐시 / 세션 ───────────────────────────────────────────────────
+# wrangler kv namespace create CACHE 실행 후 아래 id를 채워넣으세요.
+[[kv_namespaces]]
+binding = "CACHE"
+id      = "REPLACE_WITH_YOUR_KV_ID"
+
+# ── KV: 세션 스왑 저장소 ────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "SESSION_SWAP"
+id      = "REPLACE_WITH_YOUR_SESSION_KV_ID"
+
+# ── R2: 미디어 업로드 (선택 사항) ────────────────────────────────────────────
+# wrangler r2 bucket create cloudpress-cms-media 실행 후 활성화하세요.
+# [[r2_buckets]]
+# binding     = "MEDIA"
+# bucket_name = "cloudpress-cms-media"
+
+# ── 환경 변수 (평문) ─────────────────────────────────────────────────────────
+[vars]
+# 사이트가 배포된 workers.dev 서브도메인 또는 커스텀 도메인
+SITE_URL        = "https://cloudpress-cms.YOUR_SUBDOMAIN.workers.dev"
+# GitHub 파일 서빙 소유자 (호스팅 생성 시 자동 주입됨)
+GITHUB_OWNER    = ""
+GITHUB_REPO     = ""
+# WordPress 기본 테이블 접두사
+WP_TABLE_PREFIX = "wp_"
+
+# ── 필수 Secrets (wrangler secret put 으로 설정) ─────────────────────────────
+#
+#   wrangler secret put JWT_SECRET
+#     ← CMS 세션/JWT 서명 비밀키 (필수)
+#
+#   wrangler secret put GITHUB_TOKEN
+#     ← GitHub Personal Access Token (repo 권한)
+#     ← CloudPress 어드민 설정에서 입력한 토큰이 자동 주입됩니다.
+#
+#   wrangler secret put WP_ADMIN_USER
+#   wrangler secret put WP_ADMIN_PASS
+#   wrangler secret put WP_ADMIN_EMAIL
+#     ← WordPress 초기 관리자 계정 정보
+
+# ── 로컬 개발 ────────────────────────────────────────────────────────────────
+[dev]
+port           = 8787
+local_protocol = "http"
+
+# ── 빌드 설정 ────────────────────────────────────────────────────────────────
+[build]
+command = "npm run build"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 배포 순서:
+#   1. wrangler d1 create cloudpress-cms-db
+#      → 출력된 database_id 를 위 [[d1_databases]] 에 입력
+#   2. wrangler kv namespace create CACHE
+#      → 출력된 id 를 위 [[kv_namespaces]] 에 입력
+#   3. wrangler kv namespace create SESSION_SWAP
+#      → 출력된 id 를 위 [[kv_namespaces]] 에 입력
+#   4. wrangler secret put JWT_SECRET
+#   5. wrangler secret put GITHUB_TOKEN
+#   6. npm run build
+#   7. wrangler deploy
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
