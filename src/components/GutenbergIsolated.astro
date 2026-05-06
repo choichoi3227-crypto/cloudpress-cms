@@ -1,0 +1,51 @@
+---
+// src/components/GutenbergIsolated.astro
+// 이 컴포넌트는 Gutenberg 에디터를 Shadow DOM 내부에 렌더링하여
+// 워드프레스의 CSS/JS가 Astro 사이트의 다른 부분과 충돌하는 것을 방지합니다.
+---
+<div id="gutenberg-shadow-root-container"></div>
+
+<script is:inline>
+  // 클라이언트 측에서 실행될 스크립트
+  const container = document.getElementById('gutenberg-shadow-root-container');
+  if (container) {
+    // Shadow DOM 생성
+    const shadowRoot = container.attachShadow({ mode: 'open' }); // 'open' 모드로 외부에서 접근 가능하게 함
+
+    // 여기에 Gutenberg 에디터의 CSS와 JS를 로드하고 렌더링하는 로직을 추가합니다.
+    // 예시:
+    // 1. 워드프레스 에디터 관련 CSS 로드
+    const editorStyles = document.createElement('link');
+    editorStyles.rel = 'stylesheet';
+    editorStyles.href = 'https://wordpress.org/wp-includes/css/dist/block-editor/style.min.css';
+    shadowRoot.appendChild(editorStyles);
+
+    const commonStyles = document.createElement('link');
+    commonStyles.rel = 'stylesheet';
+    commonStyles.href = 'https://wordpress.org/wp-includes/css/dist/components/style.min.css';
+    shadowRoot.appendChild(commonStyles);
+
+    // 2. Gutenberg 에디터 React 컴포넌트를 Shadow DOM 내부에 마운트
+    // 이 부분은 React 코드가 번들링된 후 실행되어야 합니다.
+    // 예:
+    // import { render } from 'react-dom';
+    // import { GutenbergEditor } from './Editor.tsx'; // 실제 에디터 컴포넌트
+
+    // const editorContainer = document.createElement('div');
+    // shadowRoot.appendChild(editorContainer);
+    // render(<GutenbergEditor initialBlocks={[]} />, editorContainer);
+
+    console.log('Gutenberg editor mounted inside Shadow DOM.');
+  }
+</script>
+
+<style>
+  /* Shadow DOM 컨테이너 자체의 스타일 */
+  #gutenberg-shadow-root-container {
+    width: 100%;
+    min-height: 500px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    background-color: white;
+  }
+</style>
